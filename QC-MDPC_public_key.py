@@ -67,3 +67,6 @@ print(G,"\n\n")
 print("""Public key is (G,t), where t = 84\n\n*****\n\n""")
 
 
+
+
+

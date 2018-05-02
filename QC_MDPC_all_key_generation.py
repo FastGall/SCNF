@@ -1,10 +1,11 @@
 import random
 import numpy as np
+from binmatrix import BinMatrix
+from functools import reduce
 print("""
 n = 9602, r = 4801, w = 90, t = 84, n0 = 2, Level security - 80""")
 
 # Generate a parity check matrix H (private key)
-
 r = 4801
 w = 90
 
@@ -25,8 +26,9 @@ while(1):
 
     for i in range(r):
         H0_matrix[i] = H_first_row[i:] + H_first_row[:i]
-    H0_matrix = np.array(H0_matrix)
-    if(np.linalg.det(H0_matrix) != 0):
+    H0_matrix_m = H0_matrix
+    H0_matrix = BinMatrix(H0_matrix)
+    if(H0_matrix.det()):
         break
 
 
@@ -45,26 +47,34 @@ while(1):
 
     for i in range(r):
         H1_matrix[i] = H_first_row[i:] + H_first_row[:i]
-    H1_matrix = np.array(H1_matrix)
-    if(np.linalg.det(H1_matrix) != 0):
+    H1_matrix_m = H1_matrix
+    H1_matrix = BinMatrix(H1_matrix)
+    print(H1_matrix.det())
+    if(H1_matrix.det()):
         break
 
-
-
-H = np.hstack((H0_matrix,H1_matrix))    # private key
+H = np.hstack((H0_matrix_m,H1_matrix_m))    # private key
 
 
 
 # Generate a generator matrix
 
 
-H1_matrix = np.matrix(H1_matrix)
+H1_inverse_on_map = H1_matrix.inv()
 
-H1_inverse = np.linalg.inv(H1_matrix)
+H1_inverse = [[] for i in range(r)]
 
-H0_matrix = np.matrix(H0_matrix)
+for i in range(len(H1_inverse_on_map)):
+    for j in H1_inverse_on_map[i]:
+        H1_inverse[i].append(j)
 
-Q_matrix = H1_inverse*H0_matrix
+H1_inverse = np.array(H1_inverse)
+
+H1_matrix_m = np.array(H1_matrix_m)
+
+H0_matrix_m = np.array(H1_matrix_m)
+
+Q_matrix = H1_inverse*H0_matrix_m
 
 Q_matrix = Q_matrix.transpose()
 
@@ -88,7 +98,7 @@ I = np.matrix(I)
 
 G = np.hstack((I,Q_matrix))   # Public key
 
-print("""*****\nPublic key (G,t), where t = 84, G = \n""")
+print("""#*****\nPublic key (G,t), where t = 84, G = \n""")
 
 print(G)
 
@@ -97,5 +107,14 @@ print("""\n*****\nPrivate key H\n""")
 print(H,"\n*****")
 
 
+# SLAU
+
+H = H.transpose()
+
+
+SLAU = G*H
+
+
+print(SLAU[0])
 
 
