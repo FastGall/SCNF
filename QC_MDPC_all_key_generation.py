@@ -115,6 +115,6 @@ H = H.transpose()
 SLAU = G*H
 
 
-print(SLAU[0])
+# print(SLAU[0])
 
 
