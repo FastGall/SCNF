@@ -1,4 +1,5 @@
 import random
+import time
 import numpy as np
 from binmatrix import BinMatrix
 from functools import reduce
@@ -6,8 +7,8 @@ print("""
 n = 9602, r = 4801, w = 90, t = 84, n0 = 2, Level security - 80""")
 
 # Generate a parity check matrix H (private key)
-r = 4801
-w = 90
+r = 7186
+w = 75
 
 once_range = [i for i in range(r+1)]   # For make random '1' sequence
 
@@ -49,7 +50,7 @@ while(1):
         H1_matrix[i] = H_first_row[i:] + H_first_row[:i]
     H1_matrix_m = H1_matrix
     H1_matrix = BinMatrix(H1_matrix)
-    print(H1_matrix.det())
+    print("Determinant",H1_matrix.det())
     if(H1_matrix.det()):
         break
 
@@ -109,12 +110,30 @@ print(H,"\n*****")
 
 # SLAU
 
-H = H.transpose()
-
+G = np.array(G)
 
 SLAU = G*H
 
+CNF_list = [[] for i in range(r)]
 
-# print(SLAU[0])
+CNF = ''
+
+start_time = time.time()
+
+for i in range(r):
+    print(i)
+    CNF = CNF + '('
+    for j in range(2*r):
+        if(SLAU[i][j] != 0):
+            CNF = CNF + "x" + str(j) + "V"
+        else:
+            CNF = CNF + "¬x" + str(j) + "V"
+    CNF = CNF + ')' + '&'
+    CNF_list.append(CNF)
+    CNF = ''
+
+
+
+print("--- %s seconds ---" % (time.time() - start_time))
 
 
